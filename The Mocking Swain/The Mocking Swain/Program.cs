@@ -1,47 +1,47 @@
 ﻿#region Credits
+
 //  Special Thanks:
 //      xQx - For his Swain, Some of the functions here are from that assembly. 
 //      xSalice - For his blitzcrank assembly, I modified one of its function and adapted it to swain.
 //      SSJ4 - For his base template
+
 #endregion
 
 #region
-using System;
-using System.Collections;
-using System.Linq;
 
+using System;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SharpDX;
-using Color = System.Drawing.Color;
-using System.Collections.Generic;
-using System.Threading;
+
 #endregion
 
 namespace The_Mocking_Swain
 {
-    class Program
+    internal class Program
     {
         private const string Champion = "Swain";
         private static Orbwalking.Orbwalker Orbwalker;
         private static Spell Q, W, E, R;
         private static Menu Config;
         private static Items.Item Zhonya;
-        public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static bool RavenForm;
 
-        static void Main(string[] args)
+        public static Obj_AI_Hero Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
+        private static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        static void Game_OnGameLoad(EventArgs args)
+        private static void Game_OnGameLoad(EventArgs args)
         {
-
             if (ObjectManager.Player.BaseSkinName != Champion) return;
 
             Q = new Spell(SpellSlot.Q, 625);
-            W = new Spell(SpellSlot.W, 1000);
+            W = new Spell(SpellSlot.W, 900);
             E = new Spell(SpellSlot.E, 625);
             R = new Spell(SpellSlot.R, 625);
 
@@ -69,7 +69,9 @@ namespace The_Mocking_Swain
             Config.SubMenu("Combo").AddItem(new MenuItem("C_UseE", "E").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("C_UseR", "R").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("C_MockingSwain", "Use Zhonya while Ult").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("C_MockingSwainSlider", "Zhonya ult at Health (%)").SetValue(new Slider(30, 1, 100)));
+            Config.SubMenu("Combo")
+                .AddItem(
+                    new MenuItem("C_MockingSwainSlider", "Zhonya ult at Health (%)").SetValue(new Slider(30, 1)));
 
             //Harass Menu
             Config.AddSubMenu(new Menu("Harass", "Harass"));
@@ -77,7 +79,8 @@ namespace The_Mocking_Swain
             Config.SubMenu("Harass").AddItem(new MenuItem("H_UseW", "W").SetValue(true));
             Config.SubMenu("Harass").AddItem(new MenuItem("H_UseE", "E").SetValue(true));
             Config.SubMenu("Harass").AddItem(new MenuItem("H_AutoE", "Auto-E enemies").SetValue(true));
-            Config.SubMenu("Harass").AddItem(new MenuItem("H_ESlider", "Stop Auto E at Mana (%)").SetValue(new Slider(80, 1, 100)));
+            Config.SubMenu("Harass")
+                .AddItem(new MenuItem("H_ESlider", "Stop Auto E at Mana (%)").SetValue(new Slider(80, 1)));
 
             //Lane Clear
             Config.AddSubMenu(new Menu("Lane Clear", "Lane Clear"));
@@ -121,7 +124,6 @@ namespace The_Mocking_Swain
             }
         }
 
-
         //Credits to: xQx for this function
         private static void OnCreateObject(GameObject sender, EventArgs args)
         {
@@ -143,21 +145,20 @@ namespace The_Mocking_Swain
         {
             if (target == null) return false;
 
-            if (!Q.IsReady())
-            {
-                if (target.HasBuffOfType(BuffType.Slow) && W.GetPrediction(target).Hitchance >= HitChance.High) return true;
-                if (W.GetPrediction(target).Hitchance == HitChance.Immobile) return true;
-                if (W.GetPrediction(target).Hitchance == HitChance.VeryHigh) return true;
-            }
+            if (W.GetPrediction(target).Hitchance == HitChance.Immobile) return true;
 
-            return false;
+            if (Q.IsReady()) return false;
+            if (target.HasBuffOfType(BuffType.Slow) && W.GetPrediction(target).Hitchance >= HitChance.High)
+                return true;
+                
+            return W.GetPrediction(target).Hitchance == HitChance.VeryHigh;
         }
 
         //Thanks to xQx
         private static void AutoE()
         {
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
-            var ManaLimit = Player.MaxMana / 100 * Config.Item("H_ESlider").GetValue<Slider>().Value;
+            var ManaLimit = Player.MaxMana/100*Config.Item("H_ESlider").GetValue<Slider>().Value;
             if (Player.Mana <= ManaLimit) return;
             if (E.IsReady())
             {
@@ -165,14 +166,13 @@ namespace The_Mocking_Swain
             }
         }
 
-
         private static void MockingSwain()
         {
-            var HealthLimit = Player.MaxHealth / 100 * Config.Item("C_MockingSwainSlider").GetValue<Slider>().Value;
-            if (RavenForm && Player.Health <= HealthLimit)
+            var HealthLimit = Player.MaxHealth/100*Config.Item("C_MockingSwainSlider").GetValue<Slider>().Value;
+            if (!RavenForm || !(Player.Health <= HealthLimit)) return;
+            if (Zhonya.IsReady())
             {
-                if (Zhonya.IsReady())
-                { Zhonya.Cast(); }
+                Zhonya.Cast();
             }
         }
 
@@ -204,27 +204,25 @@ namespace The_Mocking_Swain
 
             var minions = MinionManager.GetMinions(Player.ServerPosition, R.Range);
 
-            var WRangedMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range + W.Width, MinionTypes.Ranged, MinionTeam.NotAlly, MinionOrderTypes.Health);
-            var WAllMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range + W.Width, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.Health);
-            var PredictWRangedMinions = W.GetCircularFarmLocation(WRangedMinions, W.Width * 0.75f);
-            var PredictWAllMinions = W.GetCircularFarmLocation(WAllMinions, W.Width * 0.75f);
+            var WRangedMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range + W.Width, MinionTypes.Ranged,
+                MinionTeam.NotAlly, MinionOrderTypes.Health);
+            var WAllMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range + W.Width, MinionTypes.All,
+                MinionTeam.NotAlly, MinionOrderTypes.Health);
+            var PredictWRangedMinions = W.GetCircularFarmLocation(WRangedMinions, W.Width*0.75f);
+            var PredictWAllMinions = W.GetCircularFarmLocation(WAllMinions, W.Width*0.75f);
 
 
             if (useW && W.IsReady())
             {
-
                 if (PredictWRangedMinions.MinionsHit >= 3 && W.IsInRange(PredictWRangedMinions.Position.To3D()))
                 {
                     W.Cast(PredictWRangedMinions.Position);
                     return;
                 }
-                else
+                if (PredictWAllMinions.MinionsHit >= 3 && W.IsInRange(PredictWAllMinions.Position.To3D()))
                 {
-                    if (PredictWAllMinions.MinionsHit >= 3 && W.IsInRange(PredictWAllMinions.Position.To3D()))
-                    {
-                        W.Cast(PredictWAllMinions.Position);
-                        return;
-                    }
+                    W.Cast(PredictWAllMinions.Position);
+                    return;
                 }
             }
 
@@ -242,9 +240,7 @@ namespace The_Mocking_Swain
                     R.Cast();
                 }
             }
-
         }
-
 
         private static void LastHit()
         {
@@ -257,7 +253,7 @@ namespace The_Mocking_Swain
             {
                 if (useQ)
                 {
-                    if (minion.Health < Player.GetSpellDamage(minion, SpellSlot.Q, 0) && Q.IsReady())
+                    if (minion.Health < Player.GetSpellDamage(minion, SpellSlot.Q) && Q.IsReady())
                     {
                         Q.Cast(minion);
                         return;
@@ -266,7 +262,7 @@ namespace The_Mocking_Swain
 
                 if (useE)
                 {
-                    if (minion.Health < E.GetDamage(minion) / 4 && E.IsReady())
+                    if (minion.Health < E.GetDamage(minion)/4 && E.IsReady())
                     {
                         E.Cast(minion);
                         return;
