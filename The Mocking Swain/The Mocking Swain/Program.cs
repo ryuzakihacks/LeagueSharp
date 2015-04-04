@@ -91,11 +91,11 @@ namespace The_Mocking_Swain
             Config.AddSubMenu(new Menu("Last Hit", "Last Hit"));
             Config.SubMenu("Last Hit").AddItem(new MenuItem("LH_UseQ", "Q").SetValue(true));
             Config.SubMenu("Last Hit").AddItem(new MenuItem("LH_UseE", "E").SetValue(true));
-
+            Config.AddItem(new MenuItem("urfmode", "URF Mode").SetValue(false));
             Game.PrintChat("The Mocking Swain Loaded!");
             //Nerd Shit
             Config.AddToMainMenu();
-            Game.OnGameUpdate += OnGameUpdate;
+            Game.OnUpdate+= OnGameUpdate;
             GameObject.OnCreate += OnCreateObject;
             GameObject.OnDelete += OnDeleteObject;
         }
@@ -147,7 +147,11 @@ namespace The_Mocking_Swain
 
             if (W.GetPrediction(target).Hitchance == HitChance.Immobile) return true;
 
-            if (Q.IsReady()) return false;
+            if (!Config.Item("urfmode").GetValue<bool>())
+            {
+                if (Q.IsReady()) return false;
+            }
+            
             if (target.HasBuffOfType(BuffType.Slow) && W.GetPrediction(target).Hitchance >= HitChance.High)
                 return true;
                 
@@ -159,7 +163,12 @@ namespace The_Mocking_Swain
         {
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
             var ManaLimit = Player.MaxMana/100*Config.Item("H_ESlider").GetValue<Slider>().Value;
-            if (Player.Mana <= ManaLimit) return;
+            
+            if (!Config.Item("urfmode").GetValue<bool>())
+            {
+                if (Player.Mana <= ManaLimit) return;
+            }
+            
             if (E.IsReady())
             {
                 E.Cast(target);
@@ -235,7 +244,7 @@ namespace The_Mocking_Swain
                         R.Cast();
                     }
                 }
-                else if (RavenForm)
+                else if (RavenForm && !Config.Item("urfmode").GetValue<bool>())
                 {
                     R.Cast();
                 }

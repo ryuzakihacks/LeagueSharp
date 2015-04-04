@@ -1,0 +1,12 @@
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\The Mocking Swain.exe.config
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\The Mocking Swain.exe
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\The Mocking Swain.pdb
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\LeagueSharp.Common.dll
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\LeagueSharp.dll
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\SharpDX.dll
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\SharpDX.Direct3D9.dll
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\clipper_library.dll
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\bin\x86\Release\LeagueSharp.xml
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\obj\x86\Release\The Mocking Swain.csprojResolveAssemblyReference.cache
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\obj\x86\Release\The Mocking Swain.exe
+C:\Users\admin\Documents\GitHub\LeagueSharp\The Mocking Swain\The Mocking Swain\obj\x86\Release\The Mocking Swain.pdb
